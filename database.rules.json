@@ -1,0 +1,36 @@
+{
+  "rules": {
+    "users": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('role').val() === 'manager')",
+        ".validate": "newData.hasChildren(['name', 'email', 'role'])"
+      }
+    },
+    "products": {
+      ".read": "auth != null",
+      ".indexOn": "stock",
+      "$productId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'manager'"
+      }
+    },
+    "sales": {
+      ".read": "auth != null",
+      ".indexOn": ["status","createdAt"],
+      "$saleId": {
+        ".read": "auth != null && (data.child('createdByUid').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'manager')",
+        ".write": "auth != null && ((!data.exists() && newData.child('status').val() === 'pending' && newData.child('createdByUid').val() === auth.uid && newData.child('approvedAt').val() === null && newData.child('rejectedAt').val() === null) || root.child('users').child(auth.uid).child('role').val() === 'manager' || (data.exists() && data.child('createdByUid').val() === auth.uid && data.child('status').val() === 'pending' && data.child('createdAt').val() >= (now - 600000) && newData.child('status').val() === data.child('status').val()))",
+        ".validate": "newData.hasChildren(['productId','productName','quantity','price','total','userEmail','status','createdAt','deviceInfo'])"
+      }
+    },
+
+    "auditLogs": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'manager'",
+      ".indexOn": "timestamp",
+      "$logId": {
+        ".write": "auth != null && !data.exists()",
+        ".validate": "newData.hasChildren(['action','performedBy','timestamp','details'])"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+goLow stock alert dropdown request (no functional changes requested yet).
+
+Implementation approach (will require code + CSS changes):
+- Replace lowStockAlerts rendering from a plain list into a dropdown component.
+- Add a clickable header/button that toggles visibility of the alerts panel.
+- Ensure accessible markup (button with aria-expanded, role="region").
+- Add minimal CSS classes in style.css for dropdown styling.
+
+Files to modify: dashboard.js, index.html (optional), style.css.
+

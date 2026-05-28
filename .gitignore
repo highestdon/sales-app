@@ -1,0 +1,8 @@
+node_modules
+backend/node_modules
+backend/.env
+backend/serviceAccountKey.json
+.firebase
+.vscode
+*.log
+npm-debug.log

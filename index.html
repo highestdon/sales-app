@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jewelry Sales Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+  <meta name="theme-color" content="#2b2b5c" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo-ring">💎</span>
+        <div>
+          <h1>DON Jewelry Hub</h1>
+          <p>Sales tracker for managers and reps</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="btn btn-secondary">Light mode</button>
+        <button id="refreshBtn" class="btn btn-secondary">Refresh</button>
+        <button id="hamburgerMenu" class="hamburger-btn hidden" aria-label="Manager menu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        <button id="signOutBtn" class="btn btn-ghost hidden">Sign out</button>
+        <div id="hamburgerDropdown" class="hamburger-dropdown hidden">
+          <a href="#productFormPanel" class="dropdown-item">Add/Edit Products</a>
+          <a href="#revenueSection" class="dropdown-item">Revenue Analytics</a>
+          <a href="#pendingApprovalPanel" class="dropdown-item">Pending Approvals</a>
+          <a href="#auditLogsPanel" class="dropdown-item">Audit Logs</a>
+          <a href="#registerRepPanel" class="dropdown-item">Register Rep</a>
+        </div>
+      </div>
+    </header>
+
+    <section id="auth-screen" class="panel center-card">
+      <div class="panel-inner">
+        <h2>Welcome back</h2>
+        <p>Login with email or Google to manage sales and stock.</p>
+
+        <form id="loginForm" class="form-stack">
+          <label>
+            Email
+            <input type="email" id="emailInput" autocomplete="username" placeholder="name@domain.com" required />
+          </label>
+          <label>
+            Password
+            <input type="password" id="passwordInput" autocomplete="current-password" placeholder="Your secure password" required />
+          </label>
+          <button type="submit" class="btn btn-primary">Sign in</button>
+        </form>
+
+        <div class="divider"><span>or</span></div>
+        <button id="googleBtn" class="btn btn-secondary">Continue with Google</button>
+        <p class="muted">Managers and reps use the same login portal with role-based access.</p>
+        <div id="authError" class="notification hidden"></div>
+      </div>
+    </section>
+
+    <section id="app-screen" class="hidden page-grid">
+        <section class="panel summary-panel">
+          <div class="panel-header">
+            <h2 id="welcomeTitle">Hello</h2>
+            <p id="roleBadge" class="badge">Role</p>
+          </div>
+          <div class="summary-grid" id="summaryCards"></div>
+        </section>
+
+        <section id="managerPanels" class="panel column-gap hidden">
+          <div class="panel-header manager-header">
+            <h2>Manager Dashboard</h2>
+          </div>
+          <div class="panel card-panel" id="productFormPanel">
+            <div class="panel-header">
+              <h3 id="productFormTitle">Add New Product</h3>
+            </div>
+            <form id="addProductForm" class="form-stack compact-form">
+              <input type="hidden" id="productIdHidden" value="" />
+              <label>
+                Product name
+                <input type="text" id="productName" placeholder="Gold bracelet" required />
+              </label>
+              <label>
+                Price (GHS)
+                <input type="number" id="productPrice" min="1" placeholder="120" required />
+              </label>
+              <label>
+                Cost (GHS)
+                <input type="number" id="productCost" min="0" placeholder="80" required />
+              </label>
+              <label>
+                Category
+                <input type="text" id="productCategory" placeholder="Bracelets" required />
+              </label>
+              <label>
+                Stock quantity
+                <input type="number" id="productStock" min="0" placeholder="15" required />
+              </label>
+              <label>
+                Upload image
+                <input type="file" id="productImageFile" accept="image/*" />
+              </label>
+              <label>
+                Or image URL
+                <input type="url" id="productImage" placeholder="https://example.com/image.jpg" />
+              </label>
+              <div id="imagePreviewHolder" class="image-preview hidden">
+                <img id="imagePreview" alt="Product preview" />
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="productSubmitBtn">Add product</button>
+                <button type="button" class="btn btn-secondary hidden" id="cancelProductEditBtn">Cancel edit</button>
+              </div>
+              <div id="productMessage" class="notification hidden"></div>
+            </form>
+          </div>
+
+          <div class="panel card-panel">
+            <div class="panel-header">
+              <h3>Revenue Analytics</h3>
+            </div>
+            <div class="analytics-grid" id="revenueSection"></div>
+          </div>
+
+
+
+
+          <div class="panel card-panel" id="registerRepPanel">
+            <div class="panel-header">
+              <h3>Register Rep</h3>
+            </div>
+            <form id="registerRepForm" class="form-stack compact-form">
+              <label>
+                Full name
+                <input type="text" id="repNameInput" placeholder="Prince Mensah" required />
+              </label>
+              <label>
+                Rep email
+                <input type="email" id="repEmailInput" autocomplete="username" placeholder="rep@domain.com" required />
+              </label>
+              <label>
+                Password
+                <input type="password" id="repPasswordInput" autocomplete="new-password" placeholder="Create a strong password" required />
+              </label>
+              <button type="submit" class="btn btn-primary">Create rep account</button>
+              <div id="registerRepMessage" class="notification hidden"></div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Product catalogue</h3>
+              <p class="muted">Live product inventory from Firebase</p>
+            </div>
+          </div>
+          <div class="filter-row">
+            <label>
+              Category filter
+              <select id="categoryFilter">
+                <option value="all">All categories</option>
+              </select>
+            </label>
+          </div>
+          <div id="productsGrid" class="product-grid"></div>
+          <div id="noProducts" class="empty-state hidden">No products available yet.</div>
+        </section>
+
+        <section id="lowStockSection" class="panel hidden">
+          <div class="panel-header">
+            <h3>Low stock alerts</h3>
+          </div>
+          <div id="lowStockAlerts" class="alert-list"></div>
+        </section>
+
+        <section id="saleSection" class="panel hidden">
+          <div class="panel-header">
+            <h3>Record Sale</h3>
+          </div>
+          <div class="sale-panel">
+            <div class="sale-info">
+              <h4 id="selectedProductTitle">Select a product</h4>
+              <p id="selectedProductDetails" class="muted">Tap a product card to start.</p>
+            </div>
+            <form id="saleForm" class="form-stack compact-form">
+              <label>
+                Quantity sold
+                <input type="number" id="saleQuantity" min="1" placeholder="1" required />
+              </label>
+              <button type="submit" class="btn btn-primary">Record sale</button>
+            </form>
+            <div id="saleMessage" class="notification hidden"></div>
+          </div>
+        </section>
+
+        <section id="commissionSection" class="panel hidden">
+          <div class="panel-header">
+            <h3>Weekly Commission</h3>
+            <p class="muted">Review rep commission reports for the current week.</p>
+          </div>
+          <div id="commissionCards" class="commission-grid"></div>
+          <div id="commissionEmpty" class="empty-state hidden">No team sales recorded this week.</div>
+        </section>
+
+        <section class="panel" id="collapsibleSection">
+          <div class="collapsible-group">
+            <div class="collapsible-header" data-target="pendingApprovalPanel">
+              <h3>📋 Pending approvals</h3>
+              <span class="collapsible-icon">▼</span>
+            </div>
+            <div id="pendingApprovalPanel" class="collapsible-content hidden">
+              <div id="pendingSalesList" class="sales-list"></div>
+            </div>
+          </div>
+
+          <div class="collapsible-group">
+            <div class="collapsible-header" data-target="revenueSnapshotsPanel">
+              <h3>💰 Revenue snapshots</h3>
+              <span class="collapsible-icon">▼</span>
+            </div>
+            <div id="revenueSnapshotsPanel" class="collapsible-content hidden">
+              <div class="insights-grid">
+                <div class="chart-panel">
+                  <div class="chart-header">
+                    <h4>Daily revenue</h4>
+                    <p class="muted">Sales by day this week</p>
+                  </div>
+                  <div id="dailyRevenueChart" class="revenue-chart"></div>
+                </div>
+                <div class="chart-panel">
+                  <div class="chart-header">
+                    <h4>Monthly revenue</h4>
+                    <p class="muted">Revenue by week this month</p>
+                  </div>
+                  <div id="monthlyRevenueChart" class="revenue-chart"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible-group">
+            <div class="collapsible-header" data-target="topRepPanel">
+              <h3>🏆 Top rep leaderboard</h3>
+              <span class="collapsible-icon">▼</span>
+            </div>
+            <div id="topRepPanel" class="collapsible-content hidden">
+              <div class="leaderboard-row">
+                <div class="leader-panel">
+                  <div class="panel-header">
+                    <h4>Top rep leaderboard</h4>
+                  </div>
+                  <div id="repLeaderboard" class="top-products"></div>
+                </div>
+                <div class="leader-panel">
+                  <div class="panel-header">
+                    <h4>Top products</h4>
+                  </div>
+                  <div id="topProductsList" class="top-products"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible-group">
+            <div class="collapsible-header" data-target="salesListSection">
+              <h3>📊 Recent Sales</h3>
+              <span class="collapsible-icon">▼</span>
+            </div>
+            <div id="salesListSection" class="collapsible-content hidden">
+              <button id="exportCsvBtn" class="btn btn-secondary btn-export">Export sales CSV</button>
+              <div id="salesList" class="sales-list"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script>
+
+  <script>
+    // Prevent the service worker from using a stale cached shell while migrating backend.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations?.().then((regs) => {
+        regs?.forEach((r) => r.unregister());
+      });
+    }
+  </script>
+
+
+  <script type="module" src="auth.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('service-worker.js')
+          .then((registration) => {
+            console.log('Service Worker registered:', registration.scope);
+            registration.update();
+          })
+          .catch((error) => console.error('Service Worker registration failed:', error));
+      });
+    }
+  </script>
+</body>
+</html>
