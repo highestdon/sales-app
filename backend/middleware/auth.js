@@ -25,6 +25,12 @@ function getFirebaseAdmin() {
 }
 
 async function verifyFirebaseToken(req, res, next) {
+  // Allow CORS preflight to pass through without auth.
+  // Browsers send OPTIONS before POST when custom headers (Authorization) are used.
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   try {
     const authHeader = req.headers.authorization || '';
     const [, token] = authHeader.split(' ');
@@ -43,7 +49,6 @@ async function verifyFirebaseToken(req, res, next) {
       role: null,
 
     };
-
 
     return next();
   } catch (err) {

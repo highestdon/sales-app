@@ -1,6 +1,6 @@
 // apiClient.js (minimal helper for REST calls to MongoDB backend)
 
-export const API_BASE_URL = 'http://localhost:5000';
+export const API_BASE_URL = 'https://sales-app-x250.onrender.com';
 
 export async function apiFetch(path, { method = 'GET', body = undefined, token = window.firebaseIdToken } = {}) {
   // token may be fetched lazily from Firebase Auth; avoids passing undefined during initial render.
