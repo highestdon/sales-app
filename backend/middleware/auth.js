@@ -80,9 +80,15 @@ async function verifyFirebaseToken(req, res, next) {
     };
 
     return next();
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid/expired token', details: err.message });
-  }
+ } catch (err) {
+  console.error('FIREBASE AUTH ERROR:', err);
+
+  return res.status(401).json({
+    error: 'Invalid/expired token',
+    details: err.message,
+    stack: err.stack
+  });
+}
 }
 
 module.exports = { verifyFirebaseToken };
